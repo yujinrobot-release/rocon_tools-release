@@ -1,0 +1,12 @@
+Source: ros-indigo-rocon-interactions
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), python-catkin-pkg, ros-indigo-catkin, ros-indigo-roslint
+Homepage: http://ros.org/wiki/rocon_interactions
+Standards-Version: 3.9.2
+
+Package: ros-indigo-rocon-interactions
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-rospkg, ros-indigo-genpy, ros-indigo-rocon-bubble-icons, ros-indigo-rocon-console, ros-indigo-rocon-icons, ros-indigo-rocon-interaction-msgs, ros-indigo-rocon-python-comms, ros-indigo-rocon-python-utils, ros-indigo-rocon-std-msgs, ros-indigo-rocon-uri, ros-indigo-rospy, ros-indigo-unique-id
+Description: Interaction management for human interactive agents in the concert.
