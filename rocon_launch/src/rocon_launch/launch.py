@@ -43,7 +43,7 @@ def preexec():
     os.setpgrp()  # setpgid(0,0)
 
 
-def get_roslaunch_pid(parent_pid):
+def get_roslaunch_pids(parent_pid):
     '''
       Search the pstree of the parent pid for any rocon launched process.
     '''
@@ -58,7 +58,7 @@ def get_roslaunch_pid(parent_pid):
             if command == 'roslaunch':
                 pids.append(int(pid))
             else:
-                pids.extend(get_roslaunch_pid(int(pid)))
+                pids.extend(get_roslaunch_pids(int(pid)))
     else:
         # Presume this roslaunch was killed by ctrl-c or terminated already.
         # Am not worrying about classifying between the above presumption and real errors for now
@@ -71,7 +71,7 @@ def signal_handler(sig, frame):
     global roslaunch_pids
     global hold
     for p in processes:
-        roslaunch_pids.extend(get_roslaunch_pid(p.pid))
+        roslaunch_pids.extend(get_roslaunch_pids(p.pid))
     # kill roslaunch's
     for pid in roslaunch_pids:
         try:
@@ -90,7 +90,8 @@ def signal_handler(sig, frame):
             pass  # this happens when you ctrl-c again instead of enter
     # now kill konsoles
     for p in processes:
-        p.terminate()
+        os.killpg(p.pid, signal.SIGTERM)
+        #p.terminate()
 
 
 def _process_arg_tag(tag, args_dict=None):
