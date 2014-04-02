@@ -1,0 +1,12 @@
+Source: ros-indigo-rocon-master-info
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), ros-indigo-catkin
+Homepage: http://ros.org/wiki/rocon_master_info
+Standards-Version: 3.9.2
+
+Package: ros-indigo-rocon-master-info
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-indigo-rocon-console, ros-indigo-rocon-icons, ros-indigo-rocon-python-comms, ros-indigo-rocon-python-utils, ros-indigo-rocon-std-msgs, ros-indigo-rospy
+Description: Publish master information - name, description, icon.
