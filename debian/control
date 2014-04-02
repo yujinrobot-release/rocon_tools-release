@@ -1,0 +1,12 @@
+Source: ros-indigo-rocon-python-redis
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), ros-indigo-catkin
+Homepage: http://ros.org/wiki/rocon_python_redis
+Standards-Version: 3.9.2
+
+Package: ros-indigo-rocon-python-redis
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+Description: Locally patched version of the python redis client.
