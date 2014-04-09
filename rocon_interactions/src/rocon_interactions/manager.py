@@ -13,6 +13,7 @@ import rosgraph
 import unique_id
 import rocon_interaction_msgs.msg as interaction_msgs
 import rocon_interaction_msgs.srv as interaction_srvs
+import rocon_uri
 
 from .remocon_monitor import RemoconMonitor
 from .interactions_table import InteractionsTable
@@ -64,7 +65,6 @@ class InteractionsManager(object):
                 for i in invalid_interactions:
                     rospy.logwarn("Interactions : failed to load %s [%s-%s-%s]" %
                                   (i.display_name, i.name, i.role, i.namespace))
-                self._publish_roles()
             except YamlResourceNotFoundException as e:
                 rospy.logerr("Interactions : failed to load resource %s [%s]" %
                              (resource_name, str(e)))
@@ -110,7 +110,6 @@ class InteractionsManager(object):
           namespace.
         '''
         publishers = {}
-        publishers['roles'] = rospy.Publisher('~roles', interaction_msgs.Roles, latch=True)
         publishers['interactive_clients'] = rospy.Publisher('~interactive_clients',
                                                             interaction_msgs.InteractiveClients,
                                                             latch=True)
@@ -122,6 +121,9 @@ class InteractionsManager(object):
           namespace.
         '''
         services = {}
+        services['get_roles'] = rospy.Service('~get_roles',
+                                                     interaction_srvs.GetRoles,
+                                                     self._ros_service_get_roles)
         services['get_interactions'] = rospy.Service('~get_interactions',
                                                      interaction_srvs.GetInteractions,
                                                      self._ros_service_get_interactions)
@@ -188,11 +190,28 @@ class InteractionsManager(object):
         if request.roles:  # works for None or empty list
             unavailable_roles = [x for x in request.roles if x not in self.interactions_table.roles()]
             for role in unavailable_roles:
-                rospy.logwarn("Interactions : received request for interactions of an unregistered role [%s]" % role)
+                rospy.logerr("Interactions : received request for interactions of an unregistered role [%s]" % role)
 
-        filtered_interactions = self.interactions_table.filter(request.roles, request.uri)
+        try:
+            filtered_interactions = self.interactions_table.filter(request.roles, request.uri)
+        except rocon_uri.RoconURIValueError as e:
+            rospy.logerr("Interactions : received request for interactions to be filtered by an invalid rocon uri [%s][%s]" % (request.uri, str(e)))
+            filtered_interactions = []
         for i in filtered_interactions:
             response.interactions.append(i.msg)
+        return response
+
+    def _ros_service_get_roles(self, request):
+        uri = request.uri if request.uri != '' else 'rocon:/'
+        try:
+            filtered_interactions = self.interactions_table.filter([], uri)
+        except rocon_uri.RoconURIValueError as e:
+            rospy.logerr("Interactions : received request for roles to be filtered by an invalid rocon uri [%s][%s]" % (rocon_uri, str(e)))
+            filtered_interactions = []
+        role_list = list(set([i.role for i in filtered_interactions]))
+        role_list.sort()
+        response = interaction_srvs.GetRolesResponse()
+        response.roles = role_list
         return response
 
     def _ros_service_set_interactions(self, request):
@@ -218,9 +237,6 @@ class InteractionsManager(object):
             removed_interactions = self.interactions_table.unload(request.interactions)
             for i in removed_interactions:
                 rospy.loginfo("Interactions : unloading %s [%s-%s-%s]" % (i.display_name, i.name, i.role, i.namespace))
-        # could check explicitly if roles were added/removed, but this isn't called often, so it's not expensive
-        # just to republish the list (so long as nothing is assuming there HAS to be state changes this is ok.
-        self._publish_roles()
         # send response
         response = interaction_srvs.SetInteractionsResponse()
         response.result = True
@@ -230,22 +246,22 @@ class InteractionsManager(object):
         response = interaction_srvs.RequestInteractionResponse()
         response.result = True
         response.error_code = interaction_msgs.ErrorCodes.SUCCESS
-        maximum_quota = None
         interaction = self.interactions_table.find(request.hash)
+        # for interaction in self.interactions_table.interactions:
+        #     rospy.logwarn("Interactions:   [%s][%s][%s]" % (interaction.name, interaction.hash, interaction.max))
         if interaction is not None:
-            if interaction.max == 0:
+            if interaction.max == interaction_msgs.Interaction.UNLIMITED_INTERACTIONS:
                 return response
             else:
-                maximum_quota = interaction.max
                 count = 0
                 for remocon_monitor in self._remocon_monitors.values():
                     if remocon_monitor.status is not None and remocon_monitor.status.running_app:
                         # Todo this is a weak check as it is not necessarily uniquely identifying the app
-                        # Todo - reintegrate this
+                        # Todo - reintegrate this using full interaction variable instead
                         pass
                         #if remocon_monitor.status.app_name == request.application:
                         #    count += 1
-                if count < max:
+                if count < interaction.max:
                     return response
                 else:
                     response.error_code = interaction_msgs.ErrorCodes.INTERACTION_QUOTA_REACHED
@@ -253,43 +269,12 @@ class InteractionsManager(object):
         else:
             response.error_code = interaction_msgs.ErrorCodes.INTERACTION_UNAVAILABLE
             response.message = interaction_msgs.ErrorCodes.MSG_INTERACTION_UNAVAILABLE
-        if request.role in self.role_and_app_table.keys():
-            for app in self.role_and_app_table[request.role]:  # app is interaction_msgs.RemoconApp
-                if app.name == request.application and app.namespace == request.namespace:
-                    if app.max == 0:
-                        return response
-                    else:
-                        maximum_quota = app.max
-                        break
-        if maximum_quota is not None:
-            count = 0
-            for remocon_monitor in self._remocon_monitors.values():
-                if remocon_monitor.status is not None and remocon_monitor.status.running_app:
-                    # Todo this is a weak check as it is not necessarily uniquely identifying the app
-                    if remocon_monitor.status.app_name == request.application:
-                        count += 1
-            if count < max:
-                return response
-            else:
-                response.error_code = interaction_msgs.ErrorCodes.INTERACTION_QUOTA_REACHED
-                response.message = interaction_msgs.ErrorCodes.MSG_INTERACTION_QUOTA_REACHED
-        else:
-            response.error_code = interaction_msgs.ErrorCodes.INTERACTION_UNAVAILABLE
-            response.message = interaction_msgs.ErrorCodes.MSG_INTERACTION_UNAVAILABLE
         response.result = False
         return response
 
     ##########################################################################
-    # Utiliity functions
+    # Utility functions
     ##########################################################################
-
-    def _publish_roles(self):
-        '''
-          Convenience function for publishing roles
-        '''
-        msg = interaction_msgs.Roles()
-        msg.list = self.interactions_table.roles()
-        self.publishers['roles'].publish(msg)
 
     def _bind_dynamic_symbols(self, interactions):
         '''
