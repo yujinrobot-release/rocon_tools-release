@@ -1,7 +1,0 @@
-ros-indigo-rocon-python-comms (0.1.2-0trusty) trusty; urgency=high
-
-  * bugfix install space rospair environment script location.
-
- -- Daniel Stonier <d.stonier@gmail.com>  Tue, 01 Apr 2014 15:00:00 -0000
-
-
