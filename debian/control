@@ -1,0 +1,12 @@
+Source: ros-indigo-rocon-python-utils
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), ros-indigo-catkin, ros-indigo-rostest, ros-indigo-rosunit
+Homepage: http://ros.org/wiki/rocon_python_utils
+Standards-Version: 3.9.2
+
+Package: ros-indigo-rocon-python-utils
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-catkin-pkg, python-rospkg, ros-indigo-rocon-std-msgs, ros-indigo-roslib, ros-indigo-rospy
+Description: Python system and ros utilities.
