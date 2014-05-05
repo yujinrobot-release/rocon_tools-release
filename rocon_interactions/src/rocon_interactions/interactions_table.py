@@ -1,7 +1,23 @@
 #
 # License: BSD
-#   https://raw.github.com/robotics-in-concert/rocon_concert/license/LICENSE
+#   https://raw.github.com/robotics-in-concert/rocon_tools/license/LICENSE
 #
+##############################################################################
+# Description
+##############################################################################
+
+"""
+.. module:: interactions_table
+   :platform: Unix
+   :synopsis: A database of interactions.
+
+
+This module provides a class that acts as a database (dictionary style) of
+some set of interactions.
+
+----
+
+"""
 ##############################################################################
 # Imports
 ##############################################################################
@@ -21,28 +37,42 @@ class InteractionsTable(object):
     '''
       The runtime populated interactions table along with methods to
       manipulate it.
+
+      .. include:: weblinks.rst
     '''
     __slots__ = [
         'interactions',  # rocon_interactions.interactions.Interaction[]
+        'filter_pairing_interactions'  # do not load any paired interactions
     ]
 
-    def __init__(self):
+    def __init__(self, filter_pairing_interactions=False):
+        """
+        Constructs an empty interactions table.
+
+        :param bool filter_pairing_interactions: do not load any paired interactions
+        """
         self.interactions = []
+        """List of :class:`.Interaction` objects that will form the elements of the table."""
+        self.filter_pairing_interactions = filter_pairing_interactions
+        """Flag for indicating whether pairing interactions should be filtered when loading."""
 
     def roles(self):
         '''
           List all roles for the currently stored interactions.
 
-          @return a list of all roles
-          @rtype str[]
+          :returns: a list of all roles
+          :rtype: str[]
         '''
-        # uniquify the set
+        # uniquify the list
         return list(set([i.role for i in self.interactions]))
 
     def __len__(self):
         return len(self.interactions)
 
     def __str__(self):
+        """
+        Convenient string representation of the table.
+        """
         s = ''
         role_view = self.generate_role_view()
         for role, interactions in role_view.iteritems():
@@ -56,11 +86,10 @@ class InteractionsTable(object):
           Creates a temporary copy of the interactions and sorts them into a dictionary
           view classified by role.
 
-          Note: there's got to be a faster way of doing this.
-
-          @return A role based view of the interactions
-          @rtype dict role(str) : interactions.Interaction[]
+          :returns: A role based view of the interactions
+          :rtype: dict { role(str) : :class:`.interactions.Interaction`[] }
         '''
+        # there's got to be a faster way of doing this.
         interactions = list(self.interactions)
         role_view = {}
         for interaction in interactions:
@@ -73,16 +102,14 @@ class InteractionsTable(object):
         '''
           Filter the interactions in the table according to role and/or compatibility uri.
 
-          @param roles : a list of roles to filter against, use all roles if None
-          @type str[]
+          :param roles: a list of roles to filter against, use all roles if None
+          :type roles: str []
+          :param str compatibility_uri: compatibility rocon_uri_, eliminates interactions that don't match this uri.
 
-          @param compatibility_uri : compatibility rocon uri, eliminates interactions that don't match this uri.
-          @type str (rocon_uri)
+          :returns interactions: subset of all interactions that survived the filter
+          :rtype: :class:`.Interaction` []
 
-          @return interactions : subset of all interactions that survived the filter
-          @rtype interactions.Interactions[]
-
-          @raise RoconURIValueError
+          :raises: rocon_uri.RoconURIValueError if provided compatibility_uri is invalid.
         '''
         if roles:   # works for classifying non-empty list vs either of None or empty list
             role_filtered_interactions = [i for i in self.interactions if i.role in roles]
@@ -97,22 +124,25 @@ class InteractionsTable(object):
           Load some interactions into the interaction table. This involves some initialisation
           and validation steps.
 
-          @param msgs : a list of interaction specifications to populate the table with.
-          @type rocon_interaction_msgs.msg.Interaction[]
-
-          @return list of all additions and any that were flagged as invalid
-          @rtype (interactions.Interaction[], rocon_interaction_msgs.msg..Interaction[]) : (new, invalid)
+          :param msgs: a list of interaction specifications to populate the table with.
+          :type msgs: rocon_interaction_msgs.Interaction_ []
+          :returns: list of all additions and any that were flagged as invalid
+          :rtype: (:class:`.Interaction` [], rocon_interaction_msgs.Interaction_ []) : (new, invalid)
         '''
         new = []
         invalid = []
         for msg in msgs:
-            try:
-                interaction = interactions.Interaction(msg)
-                self.interactions.append(interaction)
-                self.interactions = list(set(self.interactions))  # uniquify the list, just in case
-                new.append(interaction)
-            except InvalidInteraction:
+            # paired check
+            if self.filter_pairing_interactions and msg.pairing.rapp:
                 invalid.append(msg)
+            else:
+                try:
+                    interaction = interactions.Interaction(msg)
+                    self.interactions.append(interaction)
+                    self.interactions = list(set(self.interactions))  # uniquify the list, just in case
+                    new.append(interaction)
+                except InvalidInteraction:
+                    invalid.append(msg)
         return new, invalid
 
     def unload(self, msgs):
@@ -120,15 +150,15 @@ class InteractionsTable(object):
           Removed the specified interactions interactions table. This list is typically
           the same list as the user might initially send - no hashes yet generated.
 
-          @param msgs : a list of interactions
-          @type rocon_interaction_msgs.msg..Interaction[]
+          :param msgs: a list of interactions
+          :type msgs: rocon_interaction_msgs.Interaction_ []
 
-          @return a list of removed interactions
-          @rtype rocon_interaction_msgs.msg..Interaction[]
+          :returns: a list of removed interactions
+          :rtype: rocon_interaction_msgs.Interaction_ []
         '''
         removed = []
         for msg in msgs:
-            msg_hash = interactions.generate_hash(msg.name, msg.role, msg.namespace)
+            msg_hash = interactions.generate_hash(msg.display_name, msg.role, msg.namespace)
             found = self.find(msg_hash)
             if found is not None:
                 removed.append(msg)
@@ -139,11 +169,10 @@ class InteractionsTable(object):
         '''
           Find the specified interaction.
 
-          @param interaction_hash in crc32 format
-          @type str
+          :param str interaction_hash: in crc32 format
 
-          @return interaction if found, None otherwise.
-          @rtype rocon_interactions.Interaction
+          :returns: interaction if found, None otherwise.
+          :rtype: :class:`.Interaction`
         '''
         interaction = next((interaction for interaction in self.interactions
                             if interaction.hash == interaction_hash), None)
