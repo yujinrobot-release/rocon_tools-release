@@ -1,0 +1,12 @@
+Source: ros-indigo-rocon-icons
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), python-catkin-pkg, ros-indigo-catkin
+Homepage: http://ros.org/wiki/rocon_icons
+Standards-Version: 3.9.2
+
+Package: ros-indigo-rocon-icons
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+Description: Icons for rocon.
