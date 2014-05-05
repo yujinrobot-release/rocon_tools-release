@@ -1,3 +1,36 @@
+## rocon_tools (indigo) - 0.1.5-0
+
+User `snorri@snorriheim` released the packages in the `rocon_tools` repository into the `indigo` distro by running `/usr/bin/bloom-release --track indigo --rosdistro indigo rocon_tools` on `Mon, 05 May 2014 14:33:11 -0000`
+
+These packages were released:
+- `rocon_bubble_icons`
+- `rocon_console`
+- `rocon_ebnf`
+- `rocon_icons`
+- `rocon_interactions`
+- `rocon_launch`
+- `rocon_master_info`
+- `rocon_python_comms`
+- `rocon_python_redis`
+- `rocon_python_utils`
+- `rocon_python_wifi`
+- `rocon_semantic_version`
+- `rocon_tools`
+- `rocon_uri`
+
+Version of package(s) in repository `rocon_tools`:
+- rosdistro version: `0.1.4-0`
+- old version: `0.1.4-0`
+- new version: `0.1.5-0`
+
+Versions of tools used:
+- bloom version: `0.5.2`
+- catkin_pkg version: `0.1.27`
+- rosdep version: `0.10.25`
+- rosdistro version: `0.3.4`
+- vcstools version: `0.1.31`
+
+
 ## rocon_tools (indigo) - 0.1.4-0
 
 The packages in the `rocon_tools` repository were released into the `indigo` distro by running `/usr/bin/bloom-release --track indigo --rosdistro indigo rocon_tools` on `Wed, 16 Apr 2014 11:30:19 -0000`
