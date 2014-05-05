@@ -1,0 +1,15 @@
+ros-indigo-rocon-semantic-version (0.1.5-0trusty) trusty; urgency=high
+
+  * sphinx documentation added.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 04 May 2014 15:00:00 -0000
+
+ros-indigo-rocon-semantic-version (0.1.0-0trusty) trusty; urgency=high
+
+  * a ros-wrapped semantic_version python package.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 30 Mar 2014 15:00:00 -0000
+
+
