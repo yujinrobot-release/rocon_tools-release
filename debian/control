@@ -1,0 +1,12 @@
+Source: ros-indigo-rocon-launch
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), python-catkin-pkg, ros-indigo-catkin
+Homepage: http://ros.org/wiki/rocon_launch
+Standards-Version: 3.9.2
+
+Package: ros-indigo-rocon-launch
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-indigo-rocon-console, ros-indigo-rocon-python-utils, ros-indigo-rosbash, ros-indigo-roslaunch, ros-indigo-rospy
+Description: A multi-roslaunch (for single and multi-master systems).
