@@ -1,0 +1,23 @@
+ros-indigo-rocon-python-wifi (0.1.6-0trusty) trusty; urgency=high
+
+  * bugfix install rule of original documentation notes.
+  * maintainer correctly added.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Mon, 05 May 2014 15:00:00 -0000
+
+ros-indigo-rocon-python-wifi (0.1.5-0trusty) trusty; urgency=high
+
+  * sphinx documentation added.
+  * Contributors: Daniel Stonier
+
+ -- piyushk <piyushk@todo.todo>  Sun, 04 May 2014 15:00:00 -0000
+
+ros-indigo-rocon-python-wifi (0.1.0-0trusty) trusty; urgency=high
+
+  * rocon_python_wifi moved here from rocon_multimaster <https://github.com/robotics-in-concert/rocon_multimaster>
+  * Contributors: Daniel Stonier
+
+ -- piyushk <piyushk@todo.todo>  Sun, 30 Mar 2014 15:00:00 -0000
+
+
