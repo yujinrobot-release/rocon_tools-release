@@ -1,6 +1,6 @@
 <package>
   <name>rocon_uri</name>
-  <version>0.1.6</version>
+  <version>0.1.8</version>
   <description>
     Module for working with rocon uri strings.
   </description>
@@ -13,6 +13,8 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   
+  <run_depend>rocon_console</run_depend>
+  <run_depend>rocon_ebnf</run_depend>
   <run_depend>rospy</run_depend>
 
   <test_depend>rosunit</test_depend>
