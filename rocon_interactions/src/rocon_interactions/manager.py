@@ -29,6 +29,7 @@ import unique_id
 import rocon_interaction_msgs.msg as interaction_msgs
 import rocon_interaction_msgs.srv as interaction_srvs
 import rocon_uri
+import socket
 
 from .remocon_monitor import RemoconMonitor
 from .interactions_table import InteractionsTable
@@ -128,6 +129,8 @@ class InteractionsManager(object):
                 rospy.logerr("Interactions : error trying to retrieve information from the local master.")
             except rosgraph.masterapi.Failure:
                 rospy.logerr("Interactions : failure trying to retrieve information from the local master.")
+            except socket.error:
+                rospy.logerr("Interactions : socket error trying to retrieve information from the local master.")
             rospy.rostime.wallsleep(self._watch_loop_period)
 
     def _remocon_status_update_callback(self, new_interactions, finished_interactions):
@@ -168,9 +171,15 @@ class InteractionsManager(object):
         publishers = {}
         publishers['interactive_clients'] = rospy.Publisher('~interactive_clients',
                                                             interaction_msgs.InteractiveClients,
-                                                            latch=True)
+                                                            latch=True,
+                                                            queue_size=5
+                                                           )
         if self._parameters['pairing']:
-            publishers['pairing'] = rospy.Publisher('~pairing', interaction_msgs.Pair, latch=True)
+            publishers['pairing'] = rospy.Publisher('~pairing',
+                                                    interaction_msgs.Pair,
+                                                    latch=True,
+                                                    queue_size=5
+                                                    )
 
         return publishers
 
@@ -234,8 +243,13 @@ class InteractionsManager(object):
           Handle incoming requests for a single app.
         '''
         response = interaction_srvs.GetInteractionResponse()
-        response.interaction = self._interactions_table.find(request.hash).msg
-        response.result = False if response.interaction is None else True
+        interaction = self._interactions_table.find(request.hash)
+        if interaction is None:
+            response.interaction = interaction_msgs.Interaction()
+            response.result = False
+        else:
+            response.interaction = interaction.msg
+            response.result = True
         return response
 
     def _ros_service_get_interactions(self, request):
@@ -322,18 +336,23 @@ class InteractionsManager(object):
                     #if remocon_monitor.status.app_name == request.application:
                     #    count += 1
             if count > interaction.max:
+                rospy.loginfo("Interactions : rejected interaction request [interaction quota exceeded]")
                 return _request_interaction_response(interaction_msgs.ErrorCodes.INTERACTION_QUOTA_REACHED)
         if self._parameters['pairing']:
             if interaction.is_paired_type():
                 # abort if already pairing
                 if self.is_pairing():
+                    rospy.loginfo("Interactions : rejected interaction request [already pairing]")
                     return _request_interaction_response(interaction_msgs.ErrorCodes.ALREADY_PAIRING)
                 try:
-                    self._rapp_handler.start_rapp(interaction.pairing.rapp, interaction.pairing.remappings)
+                    self._rapp_handler.start(interaction.pairing.rapp, interaction.pairing.remappings)
                     self._pair = interaction_msgs.Pair(rapp=interaction.pairing.rapp, remocon=request.remocon)
                     self._publishers['pairing'].publish(self._pair)
-                except FailedToStartRappError:
-                    return _request_interaction_response(interaction_msgs.ErrorCodes.START_PAIRED_RAPP_FAILED)
+                except FailedToStartRappError as e:
+                    rospy.loginfo("Interactions : rejected interaction request [failed to start the paired rapp]")
+                    response = _request_interaction_response(interaction_msgs.ErrorCodes.START_PAIRED_RAPP_FAILED)
+                    response.message = "Failed to start the rapp [%s]" % str(e)  # custom response
+                    return response
         # if we get here, we've succeeded.
         return _request_interaction_response(interaction_msgs.ErrorCodes.SUCCESS)
 
