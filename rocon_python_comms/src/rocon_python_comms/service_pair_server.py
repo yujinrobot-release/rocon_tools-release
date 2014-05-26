@@ -42,7 +42,7 @@ class ServicePairServer(object):
       api for handling requests/responses on the pubsub pair. There are two
       modes of operation - 1) blocking and 2) threaded.
 
-      **Blocking Mode**
+      **Non-Threaded**
 
       In the first, the users' callback function directly runs whenever an
       incoming request is received. In this case, your callbacks should be
@@ -50,38 +50,36 @@ class ServicePairServer(object):
 
       .. code-block:: python
 
-          from rocon_python_comms import ServicePairServer
+            #!/usr/bin/env python
 
-          class Foo(object):
-              def __init__():
-                  self.server = ServicePairServer('add_two_ints',
-                                                  self.callback,
-                                                  awesome_msgs.AddTwoIntsPair,
-                                                 )
+            import rospy
+            from chatter.msg import ChatterRequest, ChatterResponse, ChatterPair
+            from rocon_python_comms import ServicePairServer
 
-              def callback(self, request_id, msg):
-                  sum = msg.first + msg.second
-                  self.server.reply(request_id, awesome_msgs.AddTwoIntsPairResponse(sum))
+            class ChatterServer(object):
+
+                def __init__(self):
+                    self.server = ServicePairServer('chatter', self.callback, ChatterPair)
+
+                def callback(self, request_id, msg):
+                    rospy.loginfo("Server : I heard %s" % msg.babble)
+                    response = ChatterResponse()
+                    response.reply = "I heard %s" % msg.babble
+                    self.server.reply(request_id, response)
+
+            if __name__ == '__main__':
+                rospy.init_node('chatter_server', anonymous=True)
+                chatter_server = ChatterServer()
+                rospy.spin()
 
       **Threaded**
 
       In the second, we spawn a background thread and shunt the callback into this thread.
+      Just toggle the ``use_threads`` flag when constructing the server:
 
       .. code-block:: python
 
-          from rocon_python_comms import ServicePairServer
-
-          class Foo(object):
-              def __init__():
-                  self.server = ServicePairServer('capture_teleop',
-                                                  self.callback,
-                                                  concert_tutorial_msgs.CaptureTeleopPair,
-                                                  use_threads=True
-                                                 )
-
-              def callback(self, request_id, msg):
-                  # do alot of work in here, possibly other ros service calls with indeterminate delay
-                  self.server.reply(request_id, concert_tutorial_msgs.CaptureTeleopPairResponse(result=True))
+          self.server = ServicePairServer('chatter', self.callback, ChatterPair, use_threads=True)
     '''
     __slots__ = [
             '_publisher',
@@ -98,12 +96,13 @@ class ServicePairServer(object):
     # Initialisation
     ##########################################################################
 
-    def __init__(self, name, callback, ServicePairSpec, use_threads=False):
+    def __init__(self, name, callback, ServicePairSpec, use_threads=False, queue_size=5):
         '''
         :param str name: resource name of service pair (e.g. testies for pair topics testies/request, testies/response)
         :param callback: function invoked when a request arrives
         :param ServicePairSpec: the pair type (e.g. rocon_service_pair_msgs.msg.TestiesPair)
         :param bool use_threads: put the callback function into a fresh background thread when a request arrives.
+        :param int queue_size: size of the queue to configure the publisher with.
         '''
         self._callback = callback
         self._use_threads = use_threads
@@ -118,7 +117,7 @@ class ServicePairServer(object):
         except AttributeError:
             raise ServicePairException("Type is not an pair spec: %s" % str(ServicePairSpec))
         self._subscriber = rospy.Subscriber(name + "/request", self.ServicePairRequest, self._internal_callback)
-        self._publisher = rospy.Publisher(name + "/response", self.ServicePairResponse)
+        self._publisher = rospy.Publisher(name + "/response", self.ServicePairResponse, queue_size=queue_size)
 
     ##########################################################################
     # Public Methods

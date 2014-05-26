@@ -1,6 +1,6 @@
 <package>
   <name>rocon_interactions</name>
-  <version>0.1.6</version>
+  <version>0.1.8</version>
   <description>
     Interaction management for human interactive agents in the concert.
   </description>
@@ -25,6 +25,7 @@
   <run_depend>rocon_bubble_icons</run_depend>
   <run_depend>rocon_console</run_depend>
   <run_depend>rocon_icons</run_depend>
+  <run_depend>rocon_app_manager_msgs</run_depend>
   <run_depend>rocon_interaction_msgs</run_depend>
   <run_depend>rocon_python_comms</run_depend>
   <run_depend>rocon_python_utils</run_depend>
