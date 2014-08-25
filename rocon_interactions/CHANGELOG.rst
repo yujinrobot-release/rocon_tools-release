@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.1.9 (2014-08-25)
+------------------
+* Fix timeouts
+* move from symbolic links to includes for changelogs to avoid eclipse bewilderment.
+* Contributors: Daniel Stonier, kentsommer
+
 0.1.7 (2014-05-26)
 ------------------
 * documentation specifying updated roslaunch/rosrunnable/web app use of parameters and remaps.
