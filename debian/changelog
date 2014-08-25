@@ -1,0 +1,72 @@
+ros-indigo-rocon-interactions (0.1.9-0saucy) saucy; urgency=high
+
+  * Fix timeouts
+  * move from symbolic links to includes for changelogs to avoid eclipse bewilderment.
+  * Contributors: Daniel Stonier, kentsommer
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 24 Aug 2014 15:00:00 -0000
+
+ros-indigo-rocon-interactions (0.1.7-0saucy) saucy; urgency=high
+
+  * documentation specifying updated roslaunch/rosrunnable/web app use of parameters and remaps.
+  * be robust against socket errors with the master, we must keep spinning.
+  * update rospy publisher queue_size to avoid warning in indigo.
+  * missing dependency on rocon_app_manager_msgs, fixes #43 <https://github.com/robotics-in-concert/rocon_tools/issues/43>.
+  * bugfix initialisation of variables to fix pairing stop app problems, #38 <https://github.com/robotics-in-concert/rocon_tools/issues/38>.
+  * increase timeout for waiting for rapp manager, refs #37 <https://github.com/robotics-in-concert/rocon_tools/issues/37>.
+  * Contributors: Daniel Stonier, Jihoon Lee, Marcus Liebhardt
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 25 May 2014 15:00:00 -0000
+
+ros-indigo-rocon-interactions (0.1.5-0saucy) saucy; urgency=high
+
+  * threadified the interactions manager rapp handler find routine, closes #37 <https://github.com/robotics-in-concert/rocon_tools/issues/37>.
+  * pairing interactions support, #34 <https://github.com/robotics-in-concert/rocon_tools/issues/34>.
+  * web_url(), web_app() specifications for web_urls and web_apps, #33 <https://github.com/robotics-in-concert/rocon_tools/issues/33>.
+  * Contributors: Daniel Stonier, Jack O'Quin
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 04 May 2014 15:00:00 -0000
+
+ros-indigo-rocon-interactions (0.1.4-0saucy) saucy; urgency=high
+
+  * bugfix get_interaction callback, return the msg, not the class, #24 <https://github.com/robotics-in-concert/rocon_tools/issues/24>
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Tue, 15 Apr 2014 15:00:00 -0000
+
+ros-indigo-rocon-interactions (0.1.3-0saucy) saucy; urgency=high
+
+  * rocon_uri variable name clashes with module name, fixed.
+  * get_roles moved to a service.
+  * more precise rocon uri os fields for pc interactions, also added trusty to the os rules.
+  * catch invalid uri's when filtering.
+  * bugfix the request interactions hash handling, had legacy msg code still being used.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Tue, 08 Apr 2014 15:00:00 -0000
+
+ros-indigo-rocon-interactions (0.1.1-0saucy) saucy; urgency=high
+
+  * test dependencies.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Mon, 31 Mar 2014 15:00:00 -0000
+
+ros-indigo-rocon-interactions (0.1.0-0saucy) saucy; urgency=high
+
+  * documentation
+  * roslint for rocon_interactions
+  * tutorials
+  * listener html example
+  * javascript library to parse interaction queries for web apps.
+  * yaml structures instead of strings for parameters in interaction yamls
+  * interactions for web apps
+  * publish roles after pre-loading, fixes #7 <https://github.com/robotics-in-concert/rocon_tools/issues/7>.
+  * a test with fake remocons
+  * symbol binding for rosbridge parameters, #6 <https://github.com/robotics-in-concert/rocon_tools/issues/6>
+  * rosbridge support for the interaction manager
+  * Contributors: Daniel Stonier, Jihoon Lee
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 30 Mar 2014 15:00:00 -0000
+
+
