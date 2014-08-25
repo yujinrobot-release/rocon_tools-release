@@ -89,7 +89,12 @@ class Terminal(object):
                 pass  # this happens when you ctrl-c again instead of enter
         # now kill the terminal itself
         for process in processes:
-            os.killpg(process.pid, signal.SIGTERM)
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+            except OSError:
+                console.warning("Kill signal failed to reach the terminal - typically this means the terminal has already shut down.")
+            except TypeError as e:
+                console.error("Invalid pid value [%s][%s]" % (str(process.pid), str(e)))
             #process.terminate()
 
     def _prepare_meta_roslauncher(self, roslaunch_configuration):
