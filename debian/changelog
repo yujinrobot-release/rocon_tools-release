@@ -1,0 +1,33 @@
+ros-indigo-rocon-bubble-icons (0.1.9-0saucy) saucy; urgency=high
+
+
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 24 Aug 2014 15:00:00 -0000
+
+ros-indigo-rocon-bubble-icons (0.1.7-0saucy) saucy; urgency=high
+
+  * rocon logo added.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 25 May 2014 15:00:00 -0000
+
+ros-indigo-rocon-bubble-icons (0.1.5-0saucy) saucy; urgency=high
+
+  * sphinx documentation added.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 04 May 2014 15:00:00 -0000
+
+ros-indigo-rocon-bubble-icons (0.1.0-0saucy) saucy; urgency=high
+
+  * stack changelogs.
+  * rocon_apps icons migrated to here.
+  * add teleop bubble icon.
+  * turtle teleop icon.
+  * few more icons.
+  * icon packs.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 30 Mar 2014 15:00:00 -0000
+
+
