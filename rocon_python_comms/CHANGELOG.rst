@@ -1,6 +1,9 @@
 Changelog
 =========
 
+0.1.10 (2014-11-21)
+-------------------
+
 0.1.9 (2014-08-25)
 ------------------
 * to fix `#54 <https://github.com/robotics-in-concert/rocon_tools/issues/54>`_
