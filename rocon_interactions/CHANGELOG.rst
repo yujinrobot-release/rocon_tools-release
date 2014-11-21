@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.10 (2014-11-21)
+-------------------
+* update web interaction examples
+* Contributors: Jihoon Lee
+
 0.1.9 (2014-08-25)
 ------------------
 * Fix timeouts
