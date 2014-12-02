@@ -1,6 +1,9 @@
 Changelog
 =========
 
+0.1.11 (2014-12-02)
+-------------------
+
 0.1.10 (2014-11-21)
 -------------------
 * Merge pull request `#62 <https://github.com/robotics-in-concert/rocon_tools/issues/62>`_ from robotics-in-concert/web
