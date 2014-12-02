@@ -1,0 +1,51 @@
+ros-indigo-rocon-master-info (0.1.11-0saucy) saucy; urgency=high
+
+
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Mon, 01 Dec 2014 15:00:00 -0000
+
+ros-indigo-rocon-master-info (0.1.10-0saucy) saucy; urgency=high
+
+
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Thu, 20 Nov 2014 15:00:00 -0000
+
+ros-indigo-rocon-master-info (0.1.9-0saucy) saucy; urgency=high
+
+  * move from symbolic links to includes for changelogs to avoid eclipse bewilderment.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 24 Aug 2014 15:00:00 -0000
+
+ros-indigo-rocon-master-info (0.1.7-0saucy) saucy; urgency=high
+
+  * update publisher queue_size to avoid warning in indigo.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 25 May 2014 15:00:00 -0000
+
+ros-indigo-rocon-master-info (0.1.5-0saucy) saucy; urgency=high
+
+  * sphinx documentation added.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 04 May 2014 15:00:00 -0000
+
+ros-indigo-rocon-master-info (0.1.4-0saucy) saucy; urgency=high
+
+  * better handling of qt and console output of master info scripts.
+  * modularising the master info retrieval script.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Tue, 15 Apr 2014 15:00:00 -0000
+
+ros-indigo-rocon-master-info (0.1.0-0saucy) saucy; urgency=high
+
+  * now depending on rocon_icons for its own icons.
+  * de-concertified the master info script.
+  * concert_info first version.
+  * Contributors: Daniel Stonier
+
+ -- Daniel Stonier <d.stonier@gmail.com>  Sun, 30 Mar 2014 15:00:00 -0000
+
+
