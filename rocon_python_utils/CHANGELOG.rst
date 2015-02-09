@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.14 (2015-02-09)
+-------------------
+* create new tools about handing name string and path
+* Contributors: dwlee
+
 0.1.13 (2015-01-12)
 -------------------
 
