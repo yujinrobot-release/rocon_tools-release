@@ -1,0 +1,12 @@
+Source: ros-indigo-rocon-ebnf
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python-catkin-pkg, ros-indigo-catkin, ros-indigo-rosunit
+Homepage: http://lparis45.free.fr/rp.html
+Standards-Version: 3.9.2
+
+Package: ros-indigo-rocon-ebnf
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+Description: Internal packaging of the 0.91 version of the simple python EBNF parser written by LParis.
