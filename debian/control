@@ -1,0 +1,12 @@
+Source: ros-indigo-rocon-python-wifi
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python-catkin-pkg, ros-indigo-catkin
+Homepage: http://pythonwifi.wikispot.org/
+Standards-Version: 3.9.2
+
+Package: ros-indigo-rocon-python-wifi
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+Description: The pythonwifi package is available through pypi, but not through a deb package. This is copy of the package suitable for use through the ROS ecosystem.
