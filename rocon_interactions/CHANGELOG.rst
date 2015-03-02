@@ -1,6 +1,9 @@
 Changelog
 =========
 
+0.1.16 (2015-03-02)
+-------------------
+
 0.1.15 (2015-02-27)
 -------------------
 * [rocon_interactions] android demo finally working.
