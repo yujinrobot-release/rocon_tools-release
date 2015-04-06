@@ -1,6 +1,9 @@
 Changelog
 =========
 
+0.1.17 (2015-04-06)
+-------------------
+
 0.1.16 (2015-03-02)
 -------------------
 * use exceptions informative way `#79 <https://github.com/robotics-in-concert/rocon_tools/issues/79>`_
