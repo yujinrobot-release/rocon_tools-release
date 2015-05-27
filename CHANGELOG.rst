@@ -1,6 +1,9 @@
 Changelog
 =========
 
+0.1.19 (2015-05-27)
+-------------------
+
 0.1.18 (2015-05-06)
 -------------------
 * Don't fail on wifi-if check for different systems
