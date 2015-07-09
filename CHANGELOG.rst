@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.1.21 (2015-07-09)
+-------------------
+* Revert "Enterprise mode for interactions (interaction with a required running rapp)"
+* [rocon_interactions] better exception handling.
+* Contributors: Daniel Stonier, Jihoon Lee
+
 0.1.20 (2015-06-01)
 -------------------
 
