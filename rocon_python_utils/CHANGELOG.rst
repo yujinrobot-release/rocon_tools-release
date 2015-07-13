@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.1.23 (2015-07-13)
+-------------------
+
+0.1.22 (2015-07-13)
+-------------------
+* move out image converter and its dependency closes `#98 <https://github.com/robotics-in-concert/rocon_tools/issues/98>`_
+* Contributors: Jihoon Lee
+
 0.1.21 (2015-07-09)
 -------------------
 * fix opencv dependency closes `#96 <https://github.com/robotics-in-concert/rocon_tools/issues/96>`_
