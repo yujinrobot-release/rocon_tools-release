@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.1.23 (2015-07-13)
+-------------------
+* import multiple found exception from exception.py closes `#97 <https://github.com/robotics-in-concert/rocon_tools/issues/97>`_
+* Contributors: Jihoon Lee
+
+0.1.22 (2015-07-13)
+-------------------
+
 0.1.21 (2015-07-09)
 -------------------
 * Revert "Enterprise mode for interactions (interaction with a required running rapp)"
