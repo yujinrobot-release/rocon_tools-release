@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.1.23 (2015-07-13)
+-------------------
+
+0.1.22 (2015-07-13)
+-------------------
+
 0.1.21 (2015-07-09)
 -------------------
 * Revert "Enterprise mode for interactions (interaction with a required running rapp)"
