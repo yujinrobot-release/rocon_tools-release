@@ -1,0 +1,12 @@
+Source: ros-kinetic-rocon-python-comms
+Section: misc
+Priority: extra
+Maintainer: AlexV <asmodehn@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python-catkin-pkg, ros-kinetic-catkin, ros-kinetic-rostest, ros-kinetic-rosunit
+Homepage: http://ros.org/wiki/rocon_python_comms
+Standards-Version: 3.9.2
+
+Package: ros-kinetic-rocon-python-comms
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-yaml, ros-kinetic-genpy, ros-kinetic-rocon-console, ros-kinetic-rocon-service-pair-msgs, ros-kinetic-rosgraph, ros-kinetic-roslib, ros-kinetic-rosnode, ros-kinetic-rospy, ros-kinetic-rosservice, ros-kinetic-rostopic, ros-kinetic-unique-id, ros-kinetic-uuid-msgs
+Description: Service pair libraries for pub/sub non-blocking services.
