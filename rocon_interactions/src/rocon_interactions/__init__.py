@@ -20,8 +20,10 @@ package. It provides python utilities for working with the console.
 from .manager import InteractionsManager
 from .loader import InteractionsLoader
 from .interactions_table import InteractionsTable
-from .interactions import load_msgs_from_yaml_resource, Interaction
+from .pairings import Pairing
+from .pairings_table import PairingsTable
+from .interactions import Interaction
 from exceptions import *
+from . import utils
 
-import web_interactions  # the library functions
-#from .web_interactions import WebInteraction  # the main class
+import web_interactions

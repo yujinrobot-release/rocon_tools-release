@@ -1,10 +1,10 @@
 <package>
   <name>rocon_python_comms</name>
-  <version>0.1.23</version>
+  <version>0.3.2</version>
   <description>
     Service pair libraries for pub/sub non-blocking services.
   </description>
-  <maintainer email="d.stonier@gmail.com">Daniel Stonier</maintainer>
+  <maintainer email="asmodehn@gmail.com">AlexV</maintainer>
   <license>BSD</license>
   <url type="website">http://ros.org/wiki/rocon_python_comms</url>
   <url type="repository">https://github.com/robotics-in-concert/rocon_tools</url>
@@ -14,7 +14,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>python-catkin-pkg</build_depend>
   <build_depend>rostest</build_depend> <!-- testing only -->
-  
+
   <run_depend>genpy</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>rosnode</run_depend>
@@ -31,7 +31,7 @@
   <test_depend>rosunit</test_depend>
 
   <export>
-    <rosdoc config="rosdoc.yaml"/>    
+    <rosdoc config="rosdoc.yaml"/>
   </export>
 
 </package>
