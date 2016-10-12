@@ -2,57 +2,56 @@
 # Android
 ###############################################################################
 
-interactions:
-    - command: com.github.rosjava.android_remocons.listener.Listener
-      group: Android
-      compatibility: rocon:/*/*/hydro|indigo/jellybean|ice_cream_sandwich
-      name: Listener
-      description: Tunes into the babble (/babbler topic).
-      max: -1
-      remappings:
-          - remap_from: chatter
-            remap_to: /babbler
+- name: com.github.rosjava.android_remocons.listener.Listener
+  role: Android
+  compatibility: rocon:/*/*/hydro|indigo/jellybean|ice_cream_sandwich
+  display_name: Listener
+  description: Tunes into the babble (/babbler topic).
+  max: -1
+  remappings:
+    - remap_from: chatter
+      remap_to: /babbler
 
-    - command: com.github.rosjava.android_remocons.talker.Talker
-      group: Android
-      compatibility: rocon:/*/*/hydro|indigo/jellybean|ice_cream_sandwich
-      name: Talker
-      description: Natters away like an old nag (/natter topic).
-      max: -1
-      remappings:
-        - remap_from: chatter
-          remap_to: /natter
+- name: com.github.rosjava.android_remocons.talker.Talker
+  role: Android
+  compatibility: rocon:/*/*/hydro|indigo/jellybean|ice_cream_sandwich
+  display_name: Talker
+  description: Natters away like an old nag (/natter topic).
+  max: -1
+  remappings:
+    - remap_from: chatter
+      remap_to: /natter
 
 #############################
 # Other Examples
 #############################
 
-#- command: com.github.robotics_in_concert.rocon_android.SolutionManager
-#  group: 'Android'
+#- name: com.github.robotics_in_concert.rocon_android.SolutionManager
+#  role: 'Android'
 #  compatibility: rocon:/mega/*/hydro|indigo/jellybean|ice_cream_sandwich
-#  name: Solution Manager
+#  display_name: Solution Manager
 #  description: Configuration manager for the concert
 #  max: -1
 
-#- command: com.github.robotics_in_concert.rocon_android.SolutionMonitor
-#  group: 'Android'
+#- name: com.github.robotics_in_concert.rocon_android.SolutionMonitor
+#  role: 'Android'
 #  compatibility: rocon:/*/*/hydro|indigo/jellybean|ice_cream_sandwich
-#  name: Solution Monitor
+#  display_name: Solution Monitor
 #  description: Monitors various aspects of the solution
 #  max: -1
 
-#- command: com.github.robotics_in_concert.rocon_android.Pizza
-#  group: 'Android'
+#- name: com.github.robotics_in_concert.rocon_android.Pizza
+#  role: 'Android'
 #  compatibility: rocon:/*/*/hydro|indigo/jellybean|ice_cream_sandwich
-#  name: Pizza Delivery
+#  display_name: Pizza Delivery
 #  description: Tantalises and tickles the taste buds with a virtual pizza
 #  parameters: 
 #    type: super_supreme
 
-#- command: com.github.robotics_in_concert.rocon_android.Beer
-#  group: 'Android'
+#- name: com.github.robotics_in_concert.rocon_android.Beer
+#  role: 'Android'
 #  compatibility: rocon:/*/*/hydro|indigo/jellybean|ice_cream_sandwich
-#  name: Beer
+#  display_name: Beer
 #  description: The super sopper
 #  remappings:
 #    - remap_from: /fosters

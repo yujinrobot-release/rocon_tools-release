@@ -38,7 +38,6 @@ class RemoconMonitor(object):
     '''
     __slots__ = [
         'name',
-        'unique_name',
         'status',  # concert_msgs.RemoconStatus
         '_subscriber',
         '_status_callback'  # triggers state updates on the manager and publishes the list of interactive clients
@@ -49,14 +48,13 @@ class RemoconMonitor(object):
     ##########################################################################
 
     def __init__(self, topic_name, remocon_status_update_callback):
-        self.name = 'unknown'
-        self.unique_name = 'unknown'
+        self.name = None
         """Name of the connected remocon."""
         if topic_name.startswith(interaction_msgs.Strings.REMOCONS_NAMESPACE + '/'):
-            self.unique_name = topic_name[len(interaction_msgs.Strings.REMOCONS_NAMESPACE) + 1:]
-            (self.name, unused_separator, unused_uuid_part) = self.unique_name.rpartition('_')
+            uuid_postfixed_name = topic_name[len(interaction_msgs.Strings.REMOCONS_NAMESPACE) + 1:]
+            (self.name, unused_separator, unused_uuid_part) = uuid_postfixed_name.rpartition('_')
         else:
-            # should raise an error here
+            self.name = 'unknown'  # should raise an error here
             return
         self._subscriber = rospy.Subscriber(topic_name, interaction_msgs.RemoconStatus, self._callback)
         """Subscriber connected to a remocon's status topic."""
@@ -74,7 +72,7 @@ class RemoconMonitor(object):
         finished_interactions = diff(old_interactions, msg.running_interactions)
         self.status = msg
         # make sure we publish whenever there is a state change (as assumed when we get a status update)
-        self._status_callback(self.unique_name, new_interactions, finished_interactions)
+        self._status_callback(new_interactions, finished_interactions)
 
     def unregister(self):
         """

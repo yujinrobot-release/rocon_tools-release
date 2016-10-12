@@ -57,13 +57,3 @@ class FailedToStartRappError(Exception):
 class FailedToStopRappError(Exception):
     """ Failed to stop rapp. """
     pass
-
-
-class FailedToListRappsError(Exception):
-    """ Failed to list rapps. """
-    pass
-
-
-class RappNotRunningError(Exception):
-    """ Rapp isn't running. """
-    pass

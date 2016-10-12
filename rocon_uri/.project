@@ -4,7 +4,6 @@
 	<comment></comment>
 	<projects>
 		<project>rocon_ebnf</project>
-		<project>rocon_python_utils</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

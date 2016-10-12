@@ -9,16 +9,7 @@ rocon_python_comms
 ------------------
 
 .. automodule:: rocon_python_comms
-    :synopsis: Additional python modules beyond rospy for ros python communications.
-
-rocon_python_comms.connections
-------------------------------
-
-.. automodule:: rocon_python_comms.connections
-    :synopsis: ROS master connections state cache
-    :members:
-    :special-members:
-    :show-inheritance:
+   :synopsis: Additional python modules beyond rospy for ros python communications.
 
 rocon_python_comms.exceptions
 -----------------------------

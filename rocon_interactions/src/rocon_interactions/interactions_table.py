@@ -22,14 +22,11 @@ some set of interactions.
 # Imports
 ##############################################################################
 
-import re
 import rocon_console.console as console
 import rocon_uri
-import rospy
 
 from . import interactions
-from . import utils
-from .exceptions import InvalidInteraction, MalformedInteractionsYaml
+from .exceptions import InvalidInteraction
 
 ##############################################################################
 # Classes
@@ -42,32 +39,32 @@ class InteractionsTable(object):
       manipulate it.
 
       .. include:: weblinks.rst
-
-      :ivar interactions: list of objects that form the elements of the table
-      :vartype interactions: rocon_interactions.interactions.Interaction[]
-      :ivar filter_pairing_interactions: flag for indicating whether pairing interactions should be filtered when loading.
-      :vartype filter_pairing_interactions: bool
     '''
-    def __init__(self,
-                 filter_pairing_interactions=False
-                 ):
+    __slots__ = [
+        'interactions',  # rocon_interactions.interactions.Interaction[]
+        'filter_pairing_interactions'  # do not load any paired interactions
+    ]
+
+    def __init__(self, filter_pairing_interactions=False):
         """
         Constructs an empty interactions table.
 
         :param bool filter_pairing_interactions: do not load any paired interactions
         """
         self.interactions = []
+        """List of :class:`.Interaction` objects that will form the elements of the table."""
         self.filter_pairing_interactions = filter_pairing_interactions
+        """Flag for indicating whether pairing interactions should be filtered when loading."""
 
-    def groups(self):
+    def roles(self):
         '''
-          List all groups for the currently stored interactions.
+          List all roles for the currently stored interactions.
 
-          :returns: a list of all groups
+          :returns: a list of all roles
           :rtype: str[]
         '''
         # uniquify the list
-        return sorted(list(set([i.group for i in self.interactions])))
+        return list(set([i.role for i in self.interactions]))
 
     def __len__(self):
         return len(self.interactions)
@@ -77,42 +74,36 @@ class InteractionsTable(object):
         Convenient string representation of the table.
         """
         s = ''
-        group_view = self.generate_group_view()
-        for group, interactions in group_view.iteritems():
-            s += console.bold + "Interactions - " + group + console.reset + '\n'
+        role_view = self.generate_role_view()
+        for role, interactions in role_view.iteritems():
+            s += console.bold + role + console.reset + '\n'
             for interaction in interactions:
                 s += "\n".join("  " + i for i in str(interaction).splitlines()) + '\n'
         return s
 
-    def sorted(self):
-        """
-        Return the interactions list sorted by name.
-        """
-        return sorted(self.interactions, key=lambda interaction: interaction.name)
-
-    def generate_group_view(self):
+    def generate_role_view(self):
         '''
           Creates a temporary copy of the interactions and sorts them into a dictionary
-          view classified by group.
+          view classified by role.
 
-          :returns: A group based view of the interactions
-          :rtype: dict { group(str) : :class:`.interactions.Interaction`[] }
+          :returns: A role based view of the interactions
+          :rtype: dict { role(str) : :class:`.interactions.Interaction`[] }
         '''
         # there's got to be a faster way of doing this.
         interactions = list(self.interactions)
-        group_view = {}
+        role_view = {}
         for interaction in interactions:
-            if interaction.group not in group_view.keys():
-                group_view[interaction.group] = []
-            group_view[interaction.group].append(interaction)
-        return group_view
+            if interaction.role not in role_view.keys():
+                role_view[interaction.role] = []
+            role_view[interaction.role].append(interaction)
+        return role_view
 
-    def filter(self, groups=None, compatibility_uri='rocon:/'):
+    def filter(self, roles=None, compatibility_uri='rocon:/'):
         '''
-          Filter the interactions in the table according to group and/or compatibility uri.
+          Filter the interactions in the table according to role and/or compatibility uri.
 
-          :param groups: a list of groups to filter against, use all groups if None
-          :type groups: str []
+          :param roles: a list of roles to filter against, use all roles if None
+          :type roles: str []
           :param str compatibility_uri: compatibility rocon_uri_, eliminates interactions that don't match this uri.
 
           :returns interactions: subset of all interactions that survived the filter
@@ -120,17 +111,17 @@ class InteractionsTable(object):
 
           :raises: rocon_uri.RoconURIValueError if provided compatibility_uri is invalid.
         '''
-        if groups:   # works for classifying non-empty list vs either of None or empty list
-            group_filtered_interactions = [i for i in self.interactions if i.group in groups]
+        if roles:   # works for classifying non-empty list vs either of None or empty list
+            role_filtered_interactions = [i for i in self.interactions if i.role in roles]
         else:
-            group_filtered_interactions = list(self.interactions)
-        filtered_interactions = [i for i in group_filtered_interactions
+            role_filtered_interactions = list(self.interactions)
+        filtered_interactions = [i for i in role_filtered_interactions
                                  if rocon_uri.is_compatible(i.compatibility, compatibility_uri)]
         return filtered_interactions
 
     def load(self, msgs):
         '''
-          Load some interactions into the table. This involves some initialisation
+          Load some interactions into the interaction table. This involves some initialisation
           and validation steps.
 
           :param msgs: a list of interaction specifications to populate the table with.
@@ -138,17 +129,20 @@ class InteractionsTable(object):
           :returns: list of all additions and any that were flagged as invalid
           :rtype: (:class:`.Interaction` [], rocon_interaction_msgs.Interaction_ []) : (new, invalid)
         '''
-        msgs = self._bind_dynamic_symbols(msgs)
         new = []
         invalid = []
         for msg in msgs:
-            try:
-                interaction = interactions.Interaction(msg)
-                self.interactions.append(interaction)
-                self.interactions = list(set(self.interactions))  # uniquify the list, just in case
-                new.append(interaction)
-            except InvalidInteraction:
+            # paired check
+            if self.filter_pairing_interactions and msg.pairing.rapp:
                 invalid.append(msg)
+            else:
+                try:
+                    interaction = interactions.Interaction(msg)
+                    self.interactions.append(interaction)
+                    self.interactions = list(set(self.interactions))  # uniquify the list, just in case
+                    new.append(interaction)
+                except InvalidInteraction:
+                    invalid.append(msg)
         return new, invalid
 
     def unload(self, msgs):
@@ -164,7 +158,7 @@ class InteractionsTable(object):
         '''
         removed = []
         for msg in msgs:
-            msg_hash = utils.generate_hash(msg.name, msg.group, msg.namespace)
+            msg_hash = interactions.generate_hash(msg.display_name, msg.role, msg.namespace)
             found = self.find(msg_hash)
             if found is not None:
                 removed.append(msg)
@@ -183,50 +177,3 @@ class InteractionsTable(object):
         interaction = next((interaction for interaction in self.interactions
                             if interaction.hash == interaction_hash), None)
         return interaction
-
-    def _bind_dynamic_symbols(self, interaction_msgs):
-        '''
-          Provide some intelligence to the interactions specification by binding designated
-          symbols at runtime. Commonly used bindings and their usage points include:
-
-          - interaction.name - __WEBSERVER_ADDRESS__
-          - interaction.parameters - __ROSBRIDGE_ADDRESS__
-          - interaction.parameters - __ROSBRIDGE_PORT__
-
-          :param interaction_msgs: parse this interaction scanning and replacing symbols.
-          :type interaction_msgs: rocon_interactions_msgs.Interaction[]
-
-          :returns: the updated interaction list
-          :rtype: rocon_interactions_msgs.Interaction[]
-        '''
-        # search for patterns of the form '<space>__PARAMNAME__,'
-        # and if found, look to see if there is a rosparam matching that pattern that we can substitute
-        pattern = '\ __(.*?)__[,|\}]'
-        for interaction in interaction_msgs:
-            for p in re.findall(pattern, interaction.parameters):
-                rparam = None
-                if p.startswith('/'):
-                    try:
-                        rparam = rospy.get_param(p)
-                    except KeyError:
-                        pass  # we show a warning below
-                elif p.startswith('~'):
-                    msg = '%s is invalid format for rosparam binding. See https://github.com/robotics-in-concert/rocon_tools/issues/81' % p
-                    raise MalformedInteractionsYaml(str(msg))
-                else:
-                    # See https://github.com/robotics-in-concert/rocon_tools/issues/81 for the rule
-                    if interaction.namespace:
-                        try:
-                            rparam = rospy.get_param(interaction.namespace)
-                        except KeyError:
-                            pass  # fallback and try again in the private namespace
-                    if rparam is None:
-                        try:
-                            rparam = rospy.get_param('~' + p)
-                        except KeyError:
-                            pass  # we show a warning below
-                if rparam is None:
-                    rospy.logwarn("Interactions : no dynamic binding found for '%s'" % p)
-                match = '__' + p + '__'
-                interaction.parameters = interaction.parameters.replace(match, str(rparam))
-        return interaction_msgs

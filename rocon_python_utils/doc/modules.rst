@@ -80,13 +80,4 @@ rocon_python_utils.system.popen
     :members:
     :special-members:
     :show-inheritance:
-
-rocon_python_utils.yaml.configure
----------------------------------
-
-.. automodule:: rocon_python_utils.yaml.configure
-    :members:
-    :special-members:
-    :show-inheritance:
-
     

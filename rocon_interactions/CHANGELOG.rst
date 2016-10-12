@@ -1,24 +1,33 @@
 Changelog
 =========
 
-0.3.2 (2016-05-11)
-------------------
-* test case for global executable with args
-* longer looping between warning messages when checking for the rapp list
+0.1.23 (2015-07-13)
+-------------------
 
-0.3.1 (2016-03-16)
-------------------
-* [rocon_interactions] bugfix various pairing problems
+0.1.22 (2015-07-13)
+-------------------
 
-0.3.0 (2015-10-10)
-------------------
-* overhauled for better pairing management
-* user side can now be dependent on a paired rapp
+0.1.21 (2015-07-09)
+-------------------
+* Revert "Enterprise mode for interactions (interaction with a required running rapp)"
+* added optional silencer for rappwatcher
+* [rocon_interactions] better exception handling.
+* [rocon_interactions] deal with required action server detection, pep8 and cleanup.
+* Merge pull request `#89 <https://github.com/robotics-in-concert/rocon_tools/issues/89>`_ from asmodehn/gocart
+  Gocart
+* added a callback to signal when the list of interactions might have changed
+* now getting running rapp from status topic.
+  Also replacing the original public_interface with the published one.
+* cleanup and fixes on required rapp verification.
+* adding required field for interaction
+  adding rapp_watcher and extending rapp_handler.
+* Contributors: AlexV, Daniel Stonier, Jihoon Lee
 
-0.2.0 (2015-08-18)
-------------------
-* required dependency on a running rapp for interactions
-* sleep function exception handling
+0.1.20 (2015-06-01)
+-------------------
+
+0.1.19 (2015-05-27)
+-------------------
 
 0.1.18 (2015-05-06)
 -------------------

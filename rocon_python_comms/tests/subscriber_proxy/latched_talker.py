@@ -4,7 +4,7 @@ import rospy
 from std_msgs.msg import String
 
 def talker():
-    pub = rospy.Publisher('chatter', String, latch=True, queue_size=5)
+    pub = rospy.Publisher('chatter', String, latch=True)
     rospy.init_node('talker')
     while not rospy.is_shutdown():
         str = "dude"
