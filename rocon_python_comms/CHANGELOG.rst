@@ -1,33 +1,27 @@
 Changelog
 =========
 
-0.1.23 (2015-07-13)
--------------------
-* import multiple found exception from exception.py closes `#97 <https://github.com/robotics-in-concert/rocon_tools/issues/97>`_
-* Contributors: Jihoon Lee
+0.3.2 (2016-05-11)
+------------------
+* master check via the rosparam server bugfix
+* allow named services in batching functions
+* drop pyros_test
 
-0.1.22 (2015-07-13)
--------------------
+0.3.1 (2016-03-16)
+------------------
+* [rocon_python_comms] connection cache node
 
-0.1.21 (2015-07-09)
--------------------
-* Revert "Enterprise mode for interactions (interaction with a required running rapp)"
-* [rocon_interactions] better exception handling.
-* Contributors: Daniel Stonier, Jihoon Lee
+0.3.0 (2015-10-10)
+------------------
+* lots of minor api added
 
-0.1.20 (2015-06-01)
--------------------
-
-0.1.19 (2015-05-27)
--------------------
-* [rocon_python_comms] connection cache added.
-* Contributors: Daniel Stonier
-
-0.1.18 (2015-05-06)
--------------------
-
-0.1.17 (2015-04-06)
--------------------
+0.2.0 (2015-08-18)
+------------------
+* one shot and indefinite waiting for service pair clients
+* basename function for ros names
+* convenience service/publisher/subscriber mass producers
+* connection cache node prototype
+* connection cache class moved here from the gateway for multi-use
 
 0.1.16 (2015-03-02)
 -------------------

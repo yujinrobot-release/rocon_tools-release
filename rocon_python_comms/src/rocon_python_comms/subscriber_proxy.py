@@ -24,6 +24,7 @@ in the same style as you would a ros service (request-response).
 
 import time
 import rospy
+import threading
 
 ##############################################################################
 # Subscriber Proxy
@@ -46,9 +47,12 @@ class SubscriberProxy():
 
         from rocon_python_comms import SubscriberProxy
 
-        gateway_info = SubscriberProxy('gateway_info', gateway_msgs.GatewayInfo)(rospy.Duration(0.5))
-        if gateway_info is not None:
-            # do something
+        try:
+            gateway_info = SubscriberProxy('gateway_info', gateway_msgs.GatewayInfo)(rospy.Duration(0.5))
+            if gateway_info is not None:
+                # do something
+        except rospy.exceptions.ROSInterruptException:  # make sure to handle a Ros shutdown
+            # react something
 
     :todo: upgrade to make use of python events instead of manual loops
     '''
@@ -56,30 +60,35 @@ class SubscriberProxy():
         '''
         :param str topic: the topic name to subscriber to
         :param str msg_type: any ros message type (e.g. std_msgs/String)
-        :param rospy.Duration timeout: timeout on the wait operation (None = /infty)
-        :returns: msg type data or None
-        :rtype: same as the msg type specified in the arg or None
         '''
-        self._subscriber = rospy.Subscriber(topic, msg_type, self._callback)
         self._data = None
+        self._lock = threading.Lock()
+        self._subscriber = rospy.Subscriber(topic, msg_type, self._callback)
 
     def __call__(self, timeout=None):
         '''
-          Returns immediately with the latest data or blocks indefinitely until
-          the next data arrives.
+          Returns immediately with the latest data or blocks to a timeout/indefinitely
+          until the next data arrives.
 
-          :param rospy.Duration timeout: time to wait for data, polling at 10Hz.
-          :returns: latest data or None
+        :param rospy.Duration timeout: time to wait for data, polling at 10Hz (None = /infty)
+        :returns: msg type data or None
+        :rtype: same as the msg type specified in the arg or None
+        :returns: latest data or None
         '''
-        if timeout:
+        if timeout is not None:
             # everything in floating point calculations
             timeout_time = time.time() + timeout.to_sec()
-        while not rospy.is_shutdown() and self._data == None:
+        with self._lock:
+            data = self._data
+        while not rospy.is_shutdown() and data is None:
             rospy.rostime.wallsleep(0.1)
-            if timeout:
+            if timeout is not None:
                 if time.time() > timeout_time:
                     return None
-        return self._data
+            # check to see if there is new data
+            with self._lock:
+                data = self._data
+        return data
 
     def wait_for_next(self, timeout=None):
         '''
@@ -107,7 +116,8 @@ class SubscriberProxy():
         raise rospy.exceptions.ROSInterruptException
 
     def _callback(self, data):
-        self._data = data
+        with self._lock:
+            self._data = data
 
     def unregister(self):
         '''

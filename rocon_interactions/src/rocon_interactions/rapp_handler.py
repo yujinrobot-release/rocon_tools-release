@@ -25,11 +25,42 @@ import rospy
 import rocon_app_manager_msgs.msg as rocon_app_manager_msgs
 import rocon_app_manager_msgs.srv as rocon_app_manager_srvs
 import rocon_python_comms
-import threading
-from .exceptions import(
-                        FailedToStartRappError,
+from .exceptions import(FailedToStartRappError,
                         FailedToStopRappError,
+                        RappNotRunningError
                         )
+
+##############################################################################
+# Utilities
+##############################################################################
+
+
+def rapp_msg_to_dict(rapp):
+    """
+    Convert rapp message to a dictionary. This is not really necessary and
+    we'd be better off flinging around the actual msg or a wrapper around
+    the msg.
+    """
+    dict_rapp = {}
+    dict_rapp["status"] = rapp.status
+    dict_rapp["name"] = rapp.name
+    dict_rapp["display_name"] = rapp.display_name
+    dict_rapp["description"] = rapp.description
+    dict_rapp["compatibility"] = rapp.compatibility
+    dict_rapp["preferred"] = rapp.preferred
+    dict_rapp["icon"] = rapp.icon
+    dict_rapp["implementations"] = rapp.implementations
+    dict_rapp["public_interface"] = rapp.public_interface
+    dict_rapp["public_parameters"] = rapp.public_parameters
+    return dict_rapp
+
+
+def rapp_list_msg_to_dict(list_rapp):
+    dict_rapp = {}
+    for rapp in list_rapp:
+        name = rapp.name
+        dict_rapp[name] = rapp_msg_to_dict(rapp)
+    return dict_rapp
 
 ##############################################################################
 # Classes
@@ -41,79 +72,100 @@ class RappHandler(object):
     Initialises from a conductor message detailing information about a
     concert client. Once established, this instance can be used as
     a convenience to start and stop rapps on the concert client.
-    """
-    __slots__ = [
-        'start_rapp',         # service proxy to this client's start_app service
-        'stop_rapp',          # service proxy to this client's stop_app service
-        'status_subscriber',  # look for status updates (particularly rapp running/not running)
-        'is_running',         # flag indicating present running status of the rapp manager.
-        'status_callback',    # function that handles toggling of pairing mode when a running rapp stops.
-        'initialised',        # flag indicating whether the rapp manager is ready or not.
-    ]
 
-    def __init__(self, status_callback):
+    :ivar is_running: flag indicating if there is a monitored rapp running on the rapp manager.
+    :vartype is_running: bool
+    :ivar _running_rapp: None, or dict representation of the running rapp (result of :py:class:`rapp_msg_to_dict()<rocon_interactions.rapp_handler.rapp_msg_to_dict>`)
+    :vartype _running_rapp: dict
+    """
+    def __init__(self, rapp_running_state_changed_callback):
         """
         Initialise the class with the relevant data required to start and stop
         rapps on this concert client.
-
-        :param status_callback function: handles toggling of pairing mode upon appropriate status updates
         """
-        self.is_running = False
-        """Flag indicating if there is a monitored rapp running on the rapp manager."""
-        self.status_callback = status_callback
-        """Callback that handles status updates of the rapp manager appropriately at a higher level (the interactions manager level)."""
-        self.initialised = False
-        """Flag indicating that the rapp manager has been found and services/topics connected."""
-        self.start_rapp = None
-        """Service proxy to the rapp manager's start_rapp service"""
-        self.stop_rapp = None
-        """Service proxy to the rapp manager's stop_rapp service"""
-        self.status_subscriber = None
-        """Subscriber to the rapp manager's status publisher"""
+        self._running_rapp = None
+        self._available_rapps = {}
+        self.rapp_running_state_changed_callback = rapp_running_state_changed_callback
+        self.subscribers = rocon_python_comms.utils.Subscribers(
+            [
+                ('~status', rocon_app_manager_msgs.Status, self._status_subscriber_callback),
+            ]
+        )
+        self.service_proxies = rocon_python_comms.utils.ServiceProxies(
+            [
+                ('~start_rapp', rocon_app_manager_srvs.StartRapp),
+                ('~stop_rapp', rocon_app_manager_srvs.StopRapp),
+            ]
+        )
+        # self._initialising_thread = threading.Thread(target=self.initialise)
+        # self._initialising_thread.start()
+        # this is blocking until it gets data
+        self.initialise()
 
-        thread = threading.Thread(target=self._setup_rapp_manager_connections())
-        thread.start()
+    @property
+    def available_rapps(self):
+        return self._available_rapps
 
-    def _setup_rapp_manager_connections(self):
+    @property
+    def initialised(self):
+        return len(self._available_rapps) != 0
+
+    @property
+    def is_running(self):
+        return self._running_rapp is not None
+
+    @property
+    def running_rapp(self):
+        return self._running_rapp
+
+    def matches_running_rapp(self, rapp_name, remappings, parameters):
+        '''
+        Compare the running rapp with an interaction's specification for a paired rapp.
+
+        .. todo:: currently it checks against the rapp name only, expand this to consider remappings and parameters
+
+        :param str rapp_name: ros package resource name for this interaction's rapp rapp
+        :param rocon_std_msgs/Remapping[] remappings: rapp remapping rules for this interaction
+        :param rocon_std_msgs/KeyValue[] parameters: rapp parameter rules for this interaction
+        :returns: whether the incoming interaction specification matches the running rapp (used for filtering)
+        :rtype; bool
+
+        :raises: :exc:`rocon_interactions.exceptions.RappNotRunningError` if the rapp wasn't running
+        '''
         try:
-            start_rapp_service_name = rocon_python_comms.find_service('rocon_app_manager_msgs/StartRapp', timeout=rospy.rostime.Duration(60.0), unique=True)
-            stop_rapp_service_name = rocon_python_comms.find_service('rocon_app_manager_msgs/StopRapp', timeout=rospy.rostime.Duration(60.0), unique=True)
-            status_topic_name = rocon_python_comms.find_topic('rocon_app_manager_msgs/Status', timeout=rospy.rostime.Duration(60.0), unique=True)
-        except rocon_python_comms.NotFoundException as e:
-            rospy.logerr("Interactions : timed out trying to find the rapp manager start_rapp, stop_rapp services and status topic [%s]" % str(e))
+            if self._running_rapp['name'] == rapp_name:
+                return True
+        except TypeError:  # NoneType
+            raise RappNotRunningError
+        return False
 
-        self.start_rapp = rospy.ServiceProxy(start_rapp_service_name, rocon_app_manager_srvs.StartRapp)
-        self.stop_rapp = rospy.ServiceProxy(stop_rapp_service_name, rocon_app_manager_srvs.StopRapp)
-        self.status_subscriber = rospy.Subscriber(status_topic_name, rocon_app_manager_msgs.Status, self._ros_status_subscriber)
+    def is_available_rapp(self, rapp_name):
+        return True if rapp_name in self._available_rapps.keys() else False
 
+    def get_rapp(self, rapp_name):
         try:
-            self.start_rapp.wait_for_service(15.0)
-            self.stop_rapp.wait_for_service(15.0)
-            # I should also check the subscriber has get_num_connections > 0 here
-            # (need to create a wait_for_publisher in rocon_python_comms)
-            self.initialised = True
-            rospy.loginfo("Interactions : initialised rapp handler connections for pairing.")
-        except rospy.ROSException:
-            rospy.logerr("Interactions : rapp manager services disappeared.")
-        except rospy.ROSInterruptException:
-            rospy.logerr("Interactions : ros shutdown while looking for the rapp manager services.")
+            return self._available_rapps[rapp_name]
+        except KeyError:
+            return None
 
-    def start(self, rapp, remappings):
+    def start(self, rapp, remappings, parameters=[]):
         """
         Start the rapp with the specified remappings.
 
-        :param str rapp: name of the rapp to start (e.g. rocon_apps/teleop)
+        :param str rapp: ros package resource name of the rapp to start (e.g. rocon_apps/teleop)
         :param remappings: remappings to apply to the rapp when starting.
-        :type remappings: rocon_std_msgs.Remapping_ []
+        :type remappings: [rocon_std_msgs.Remapping]
+        :param parameters: paramters to apply to the rapp when starting.
+        :type remappings: [rocon_std_msgs.KeyValue]
 
         .. include:: weblinks.rst
 
         :raises: :exc:`.FailedToStartRappError`
         """
         if not self.initialised:
-            raise FailedToStartRappError("rapp manager's location not known")
+            raise FailedToStartRappError("rapp manager's location unknown")
         try:
-            unused_response = self.start_rapp(rocon_app_manager_srvs.StartRappRequest(name=rapp, remappings=remappings))
+            unused_response = self.service_proxies.start_rapp(rocon_app_manager_srvs.StartRappRequest(name=rapp, remappings=remappings, parameters=parameters))
             # todo check this response and process it
         except (rospy.service.ServiceException,
                 rospy.exceptions.ROSInterruptException) as e:
@@ -131,20 +183,74 @@ class RappHandler(object):
         if not self.initialised:
             raise FailedToStopRappError("rapp manager's location not known")
         try:
-            self.stop_rapp(rocon_app_manager_srvs.StopRappRequest())
+            unused_response = self.service_proxies.stop_rapp(rocon_app_manager_srvs.StopRappRequest())
         except (rospy.service.ServiceException,
                 rospy.exceptions.ROSInterruptException) as e:
             # Service not found or ros is shutting down
             raise FailedToStopRappError("%s" % str(e))
 
-    def _ros_status_subscriber(self, msg):
+    def initialise(self):
         """
-        Relay a notification to the status callback function if we detect that a rapp has
-        stopped on the rapp manager. This is to let the higher level disable pairing mode if
-        it is the rapp manager's rapp naturally terminating rather than the user terminating
-        from the user's side.
+        Loops around (indefinitely) until it makes a connection with the rapp manager and retrieves the rapp list.
         """
-        old_running_status = self.is_running
-        self.is_running = (msg.rapp_status == rocon_app_manager_msgs.Status.RAPP_RUNNING)
-        if old_running_status and msg.rapp_status == rocon_app_manager_msgs.Status.RAPP_STOPPED:
-            self.status_callback()  # let the higher level disable pairing mode via this
+        # get the rapp list - just loop around until catch it once - it is not dynamically changing
+        rospy.loginfo("Interactions : calling the rapp manager to get the rapp list.")
+        get_rapp_list = rocon_python_comms.SubscriberProxy('~rapp_list', rocon_app_manager_msgs.RappList)
+        while not rospy.is_shutdown():
+            # msg is rocon_app_manager_msgs/RappList
+            # this returns almost immediately with None if rospy gets shutdown, so a long duration is ok
+            msg = get_rapp_list(rospy.Duration(30.0))
+            if msg is None:
+                rospy.logwarn("Interactions : unable to connect with the rapp manager : {0} not found, will keep trying.".format(rospy.resolve_name('~rapp_list')))
+            else:
+                self._available_rapps = rapp_list_msg_to_dict(msg.available_rapps)
+                rospy.loginfo("Interactions : discovered rapp support for pairing modes:")
+                for rapp in msg.available_rapps:
+                    rospy.loginfo("Interactions :     '%s'" % rapp.name)
+                break
+        get_rapp_list.unregister()
+
+    def _status_subscriber_callback(self, msg):
+        """
+        Update the current status of the rapp manager
+        @param rocon_app_manager_msgs/Status msg: detailed report of the rapp manager's current state
+        """
+        state_changed = False
+        stopped = False
+        if msg.rapp_status == rocon_app_manager_msgs.Status.RAPP_RUNNING:
+            # FIXME : This should probably be done internally in the app_manager
+            # => A we only need the published interface from a running app, without caring about the original specification
+            # => Is this statement always true ?
+            running_rapp = rapp_msg_to_dict(msg.rapp)
+            if self._running_rapp is None or self._running_rapp['name'] != running_rapp['name']:
+                state_changed = True
+#             for pubif_idx, pubif in enumerate(running_rapp['public_interface']):
+#                 newvals = ast.literal_eval(pubif.value)
+#                 for msgif in msg.published_interfaces:
+#                     if (
+#                         (pubif.key == 'subscribers' and msgif.interface.connection_type == 'subscriber') or
+#                         (pubif.key == 'publishers' and msgif.interface.connection_type == 'publisher')
+#                     ):
+#                         # rospy.loginfo('newvals %r', newvals)
+#                         for newval_idx, newval in enumerate(newvals):
+#                             # rospy.loginfo('newvals[%r] %r', newval_idx, newval)
+#                             if newval['name'] == msgif.interface.name and newval['type'] == msgif.interface.data_type:
+#                                 # Careful we re changing the list in place here
+#                                 newvals[newval_idx]['name'] = msgif.name
+#                                 # rospy.loginfo('newvals[%r] -> %r', newval_idx, newval)
+#                                 # Careful we re changing the list in place here
+#                     elif msgif.interface.connection_type not in rocon_python_comms.connections.connection_types:
+#                         rospy.logerr('Interactions : unsupported connection type : %r', msgif.interface.connection_type)
+#                 # Careful we re changing the list in place here
+#                 running_rapp['public_interface'][pubif_idx].value = str(newvals)
+#             TODO : same for published parameters ?
+            self._running_rapp = running_rapp
+            # rospy.loginfo('Interactions : new public if : %r', self._running_rapp['public_interface'])
+        elif msg.rapp_status == rocon_app_manager_msgs.Status.RAPP_STOPPED:
+            was_running = self._running_rapp is not None
+            self._running_rapp = None
+            if was_running:
+                state_changed = True
+                stopped = True  # signal the higher level disable pairing mode via this
+        if state_changed:
+            self.rapp_running_state_changed_callback(self._running_rapp, stopped)

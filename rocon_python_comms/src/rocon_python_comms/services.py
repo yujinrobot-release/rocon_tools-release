@@ -27,6 +27,7 @@ import rospy
 import socket
 import time
 from rosservice import ROSServiceIOException, get_service_headers
+from rosgraph.network import ROSHandshakeException
 
 # Local imports
 from .exceptions import NotFoundException
@@ -38,9 +39,9 @@ from .exceptions import NotFoundException
 
 def service_is_available(service_name):
     '''
-    Check whether the specific service is validated or not 
+    Check whether the specific service is validated or not
     as retrieving from master state.
-    
+
     :param: str service_name service name checking validtation
 
     :returns: result of service's validation
@@ -66,6 +67,14 @@ def find_service(service_type, timeout=rospy.rostime.Duration(5.0), unique=False
     is found, it loops around internally on a 10Hz loop until the result is
     found or the specified timeout is reached.
 
+    .. warning::
+
+       This api is particularly dangerous, especially if used across a wireless connection as it
+       creates a socket connection to the master's lookupService api for every service on the system
+       while doing its hunting. More information in:
+
+       * https://github.com/robotics-in-concert/rocon_tools/issues/68
+
     Usage:
 
     .. code-block:: python
@@ -87,6 +96,7 @@ def find_service(service_type, timeout=rospy.rostime.Duration(5.0), unique=False
     :rtype: str
 
     :raises: :exc:`.NotFoundException`
+    :raises: :exc:`rospy.ROSInterruptException` : if ros has shut down while searching.
     '''
     # we could use rosservice_find here, but that throws exceptions and aborts if it comes
     # across any rosservice on the system which is no longer valid. To be robust against this
@@ -94,7 +104,8 @@ def find_service(service_type, timeout=rospy.rostime.Duration(5.0), unique=False
     # with the only difference in that I continue over that exception.
     unique_service_name = None
     service_names = []
-    timeout_time = time.time() + timeout.to_sec()
+    start_time = time.time()
+    timeout_time = start_time + timeout.to_sec()
     master = rosgraph.Master(rospy.get_name())
     while not rospy.is_shutdown() and time.time() < timeout_time and not service_names:
         services_information = []
@@ -108,6 +119,10 @@ def find_service(service_type, timeout=rospy.rostime.Duration(5.0), unique=False
         for (service_name, service_uri) in services_information:
             try:
                 next_service_type = get_service_headers(service_name, service_uri).get('type', None)
+            except ROSHandshakeException:
+                rospy.logwarn("Handshake exception after waiting for {0} secs".format(time.time() - start_time))
+                # happens when shutting down (should handle this somehow)
+                continue
             except ROSServiceIOException:  # should also catch socket.error?
                 # ignore this - it is usually a sign of a bad service that could be thrown
                 # up by somebody else and not what we're trying to find. If we can skip past it
@@ -123,6 +138,9 @@ def find_service(service_type, timeout=rospy.rostime.Duration(5.0), unique=False
         if not service_names:
             rospy.rostime.wallsleep(0.1)
     if not service_names:
-        raise NotFoundException("timed out")
+        if rospy.is_shutdown():
+            raise rospy.ROSInterruptException("ros shut down")
+        else:
+            raise NotFoundException("timed out or ros")
 
     return unique_service_name if unique_service_name else service_names
