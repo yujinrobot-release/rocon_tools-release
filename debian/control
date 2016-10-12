@@ -1,0 +1,12 @@
+Source: ros-kinetic-rocon-master-info
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python-catkin-pkg, ros-kinetic-catkin
+Homepage: http://ros.org/wiki/rocon_master_info
+Standards-Version: 3.9.2
+
+Package: ros-kinetic-rocon-master-info
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-rospkg, ros-kinetic-rocon-bubble-icons, ros-kinetic-rocon-console, ros-kinetic-rocon-icons, ros-kinetic-rocon-python-comms, ros-kinetic-rocon-python-utils, ros-kinetic-rocon-std-msgs, ros-kinetic-rocon-uri, ros-kinetic-rospy
+Description: Publish master information - name, description, icon.
