@@ -1,3 +1,40 @@
+## rocon_tools (indigo) - 0.1.23-1
+
+The packages in the `rocon_tools` repository were released into the `indigo` distro by running `/usr/bin/bloom-release --edit-track --track indigo --rosdistro indigo rocon_tools` on `Wed, 12 Oct 2016 05:25:37 -0000`
+
+These packages were released:
+- `rocon_bubble_icons`
+- `rocon_console`
+- `rocon_ebnf`
+- `rocon_icons`
+- `rocon_interactions`
+- `rocon_launch`
+- `rocon_master_info`
+- `rocon_python_comms`
+- `rocon_python_redis`
+- `rocon_python_utils`
+- `rocon_python_wifi`
+- `rocon_semantic_version`
+- `rocon_tools`
+- `rocon_uri`
+
+Version of package(s) in repository `rocon_tools`:
+
+- upstream repository: https://github.com/robotics-in-concert/rocon_tools.git
+- release repository: https://github.com/yujinrobot-release/rocon_tools-release.git
+- rosdistro version: `0.1.23-0`
+- old version: `0.1.23-0`
+- new version: `0.1.23-1`
+
+Versions of tools used:
+
+- bloom version: `0.5.22`
+- catkin_pkg version: `0.2.10`
+- rosdep version: `0.11.5`
+- rosdistro version: `0.4.7`
+- vcstools version: `0.1.38`
+
+
 ## rocon_tools (kinetic) - 0.3.2-0
 
 The packages in the `rocon_tools` repository were released into the `kinetic` distro by running `/usr/bin/bloom-release rocon_tools --track kinetic --rosdistro kinetic --new-track` on `Tue, 10 May 2016 23:59:09 -0000`
