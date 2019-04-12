@@ -1,0 +1,12 @@
+Source: ros-melodic-rocon-launch
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python-catkin-pkg, ros-melodic-catkin
+Homepage: http://ros.org/wiki/rocon_launch
+Standards-Version: 3.9.2
+
+Package: ros-melodic-rocon-launch
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-melodic-rocon-console, ros-melodic-rocon-python-utils, ros-melodic-rosbash, ros-melodic-roslaunch, ros-melodic-rospy
+Description: A multi-roslaunch (for single and multi-master systems).
