@@ -1,0 +1,12 @@
+Source: ros-melodic-rocon-python-comms
+Section: misc
+Priority: extra
+Maintainer: AlexV <asmodehn@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python-catkin-pkg, ros-melodic-catkin, ros-melodic-rostest, ros-melodic-rosunit
+Homepage: http://ros.org/wiki/rocon_python_comms
+Standards-Version: 3.9.2
+
+Package: ros-melodic-rocon-python-comms
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-yaml, ros-melodic-genpy, ros-melodic-rocon-console, ros-melodic-rocon-service-pair-msgs, ros-melodic-rosgraph, ros-melodic-roslib, ros-melodic-rosnode, ros-melodic-rospy, ros-melodic-rosservice, ros-melodic-rostopic, ros-melodic-unique-id, ros-melodic-uuid-msgs
+Description: Service pair libraries for pub/sub non-blocking services.
