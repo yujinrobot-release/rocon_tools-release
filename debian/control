@@ -1,0 +1,12 @@
+Source: ros-melodic-rocon-interactions
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python-catkin-pkg, ros-melodic-catkin, ros-melodic-roslint, ros-melodic-rostest, ros-melodic-rosunit
+Homepage: http://ros.org/wiki/rocon_interactions
+Standards-Version: 3.9.2
+
+Package: ros-melodic-rocon-interactions
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-rospkg, ros-melodic-genpy, ros-melodic-rocon-app-manager-msgs, ros-melodic-rocon-bubble-icons, ros-melodic-rocon-console, ros-melodic-rocon-icons, ros-melodic-rocon-interaction-msgs, ros-melodic-rocon-python-comms, ros-melodic-rocon-python-utils, ros-melodic-rocon-std-msgs, ros-melodic-rocon-uri, ros-melodic-rospy, ros-melodic-std-msgs, ros-melodic-unique-id
+Description: Interaction management for human interactive agents in the concert.
