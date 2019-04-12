@@ -1,0 +1,12 @@
+Source: ros-melodic-rocon-python-utils
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python-catkin-pkg, ros-melodic-catkin, ros-melodic-rostest, ros-melodic-rosunit
+Homepage: http://ros.org/wiki/rocon_python_utils
+Standards-Version: 3.9.2
+
+Package: ros-melodic-rocon-python-utils
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-catkin-pkg, python-rospkg, ros-melodic-rocon-std-msgs, ros-melodic-roslib, ros-melodic-rospy
+Description: Python system and ros utilities.
