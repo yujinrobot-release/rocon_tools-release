@@ -1,0 +1,12 @@
+Source: ros-melodic-rocon-uri
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), ros-melodic-catkin, ros-melodic-rosunit
+Homepage: http://ros.org/wiki/rocon_uri
+Standards-Version: 3.9.2
+
+Package: ros-melodic-rocon-uri
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-rospkg, ros-melodic-rocon-console, ros-melodic-rocon-ebnf, ros-melodic-rocon-python-utils, ros-melodic-rospy
+Description: Module for working with rocon uri strings.
