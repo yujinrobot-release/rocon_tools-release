@@ -1,0 +1,12 @@
+Source: ros-melodic-rocon-tools
+Section: misc
+Priority: extra
+Maintainer: Daniel Stonier <d.stonier@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), ros-melodic-catkin
+Homepage: http://www.ros.org/wiki/rocon_tools
+Standards-Version: 3.9.2
+
+Package: ros-melodic-rocon-tools
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-melodic-rocon-console, ros-melodic-rocon-ebnf, ros-melodic-rocon-interactions, ros-melodic-rocon-launch, ros-melodic-rocon-master-info, ros-melodic-rocon-python-comms, ros-melodic-rocon-python-redis, ros-melodic-rocon-python-utils, ros-melodic-rocon-python-wifi, ros-melodic-rocon-semantic-version, ros-melodic-rocon-uri
+Description: Utilities and tools developed for rocon, but usable beyond the boundaries of rocon.
