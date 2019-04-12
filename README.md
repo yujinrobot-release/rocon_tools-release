@@ -1,3 +1,40 @@
+## rocon_tools (melodic) - 0.3.2-0
+
+The packages in the `rocon_tools` repository were released into the `melodic` distro by running `/usr/bin/bloom-release --track melodic --rosdistro melodic rocon_tools` on `Fri, 12 Apr 2019 12:40:38 -0000`
+
+These packages were released:
+- `rocon_bubble_icons`
+- `rocon_console`
+- `rocon_ebnf`
+- `rocon_icons`
+- `rocon_interactions`
+- `rocon_launch`
+- `rocon_master_info`
+- `rocon_python_comms`
+- `rocon_python_redis`
+- `rocon_python_utils`
+- `rocon_python_wifi`
+- `rocon_semantic_version`
+- `rocon_tools`
+- `rocon_uri`
+
+Version of package(s) in repository `rocon_tools`:
+
+- upstream repository: https://github.com/robotics-in-concert/rocon_tools.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `0.3.2-0`
+
+Versions of tools used:
+
+- bloom version: `0.7.2`
+- catkin_pkg version: `0.4.10`
+- rosdep version: `0.15.0`
+- rosdistro version: `0.7.0`
+- vcstools version: `0.1.40`
+
+
 ## rocon_tools (kinetic) - 0.3.2-1
 
 The packages in the `rocon_tools` repository were released into the `kinetic` distro by running `/usr/bin/bloom-release --edit-track --track kinetic --rosdistro kinetic rocon_tools` on `Wed, 12 Oct 2016 07:44:43 -0000`
